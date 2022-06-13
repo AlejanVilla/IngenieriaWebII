@@ -1,10 +1,17 @@
 const { Router } = require("express");
+const { validarMarca } = require("../helpers/validar-marca");
 const Marca = require("../models/Marca");
 const router = Router();
 
 router.post('/',async function(req, res){
     
     try{
+
+        const validacionesM = validarMarca(req); 
+
+        if(validacionesM.length > 0) {
+            return res.status(400).send(validacionesM);
+        }
         console.log(req.body);
     
               

@@ -9,7 +9,7 @@ const UsuarioSchema = Schema({
         type: String,
         unique: true, //valor unico
     },
-    estado: {
+    estadoU: {
         type: String,
         required: true,
         enum: [

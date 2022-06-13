@@ -1,5 +1,6 @@
 const { Router } = require("express");
 const Inventario = require('../models/Inventario');
+const { validarInventario } = require ("../helpers/validar-inventario");
 
 const router = Router();
 
@@ -7,6 +8,12 @@ const router = Router();
 router.post('/', async function(req, res){
 
     try {
+
+        const validaciones = validarInventario(req); 
+
+        if(validaciones.length > 0) {
+            return res.status(400).send(validaciones);
+        }
 
         console.log(req.body);
 
@@ -23,9 +30,9 @@ router.post('/', async function(req, res){
         inventario.fechaCompra = req.body.fechaCompra;
         inventario.precio = req.body.precio;
         inventario.usuario = req.body.usuario._id;
-        inventario.marca = req.body.marca_id;
-        inventario.tipoEquipo = req.body.tipoEquipo_id;
-        inventario.estadoEquipo = req.body.estadoEquipo_id;
+        inventario.marca = req.body.marca._id;
+        inventario.tipoEquipo = req.body.tipoEquipo._id;
+        inventario.estadoEquipo = req.body.estadoEquipo._id;
         inventario.fechaCreacion = new Date();
         inventario.fechaActualizacion = new Date();
 
@@ -43,10 +50,10 @@ router.get('/', async function(req, res){
 
     try {
         const inventarios = await Inventario.find().populate([
-            { path: 'usuario', select: 'nombre email' },
-            { path: 'marca', select: 'nombre' },
-            { path: 'tipoEquipo', select: 'nombre' },
-            { path: 'estadoEquipo', select: 'nombre' }              
+            { path: 'usuario', select: 'nombre email estado' },
+            { path: 'marca', select: 'nombre estado' },
+            { path: 'tipoEquipo', select: 'nombre estado' },
+            { path: 'estadoEquipo', select: 'nombre estado' }              
         ]);
         res.send(inventarios);
     } catch(error) {
@@ -79,9 +86,9 @@ router.put('/:inventarioId', async function(req, res){
         inventario.fechaCompra = req.body.fechaCompra;
         inventario.precio = req.body.precio;
         inventario.usuario = req.body.usuario._id;
-        inventario.marca = req.body.marca_id;
-        inventario.tipoEquipo = req.body.tipoEquipo_id;
-        inventario.estadoEquipo = req.body.estadoEquipo_id;
+        inventario.marca = req.body.marca._id;
+        inventario.tipoEquipo = req.body.tipoEquipo._id;
+        inventario.estadoEquipo = req.body.estadoEquipo._id;
         inventario.fechaActualizacion = new Date();
 
         inventario = await inventario.save();
@@ -90,6 +97,19 @@ router.put('/:inventarioId', async function(req, res){
     } catch(error) {
         console.log(error);
         res.status(500).send('Ocurrio un error en el servidor')
+    }
+});
+
+router.get("/:inventarioId", async function(req, res) {
+    try {
+        const inventario = await Inventario.findById(req.params.inventarioId);
+        if (!inventario) {
+            return res.status(404).send("Inventario no existe");            
+        }
+        res.send(inventario);
+    } catch (error) {
+        console.log(error);
+        res.status(500).send('Ocurrio un error en el servidor'); 
     }
 });
 

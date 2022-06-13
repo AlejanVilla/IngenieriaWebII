@@ -5,6 +5,7 @@ const InventarioSchema = Schema ({
     serial: {
         type: String,
         required: true,
+        unique: true,
     },
     modelo: {
         type: String,
